@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Countries of the World: a quiz game for country outlines, flags, capitals and map locations for all 197 countries.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23eef2ee' stroke='%2316302a' stroke-width='2'/%3E%3Cpath d='M5 13c4-2 6 1 9 0s4-5 8-4 4 4 5 6M6 21c3 1 5-1 8 0s5 3 9 1' fill='none' stroke='%2316302a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Countries of the World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap">
+<style>
+:root{
+  --paper:#eef2ee; --surface:#f9fbf8; --ink:#16302a; --ink-2:#4a6359; --ink-3:#7f958b; --rule:#cdd9d1; --accent:#1f6b52;
+  --sea:#dae7ea; --grat:#c3d6db; --land:#f6f3ea; --land-2:#e6e2d6; --coast:#6d8178; --hover:#e9dcbc; --hi:#c9741f;
+  --good:#22704d; --good-bg:#dcefe3; --bad:#a3392f; --bad-bg:#f6e0dc;
+  --f-display:"IM Fell English", "Iowan Old Style", Georgia, serif;
+  --f-sc:"IM Fell English SC", "IM Fell English", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0b1512; --surface:#111f1a; --ink:#dce8e2; --ink-2:#9cb3a8; --ink-3:#62796e; --rule:#24382f; --accent:#7fd1ae;
+    --sea:#0d1c21; --grat:#173039; --land:#22352d; --land-2:#17251f; --coast:#71917f; --hover:#3d4d34; --hi:#f0a04b;
+    --good:#74cfa3; --good-bg:#11302a; --bad:#f19387; --bad-bg:#3b1d1d; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0b1512; --surface:#111f1a; --ink:#dce8e2; --ink-2:#9cb3a8; --ink-3:#62796e; --rule:#24382f; --accent:#7fd1ae;
+  --sea:#0d1c21; --grat:#173039; --land:#22352d; --land-2:#17251f; --coast:#71917f; --hover:#3d4d34; --hi:#f0a04b;
+  --good:#74cfa3; --good-bg:#11302a; --bad:#f19387; --bad-bg:#3b1d1d; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+img{max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.1}
+p{margin:0}
+a{color:var(--accent)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* masthead */
+.masthead .wrap{padding-block:max(36px, env(safe-area-inset-top, 0px)) 24px;display:grid;gap:10px}
+.home-link{justify-self:start;display:inline-flex;align-items:center;gap:7px;margin-bottom:10px;padding:6px 14px 6px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);color:var(--ink-2);font-size:.9rem;font-weight:700;text-decoration:none;transition:color .15s, border-color .15s}
+.home-link svg{width:16px;height:16px;flex:none;transition:transform .15s}
+.home-link:hover{color:var(--ink);border-color:var(--ink)}
+.home-link:hover svg{transform:translateX(-2px)}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:700}
+.masthead h1{font-size:clamp(2.6rem, 7vw, 4.6rem);letter-spacing:-.01em}
+.masthead h1 i{color:var(--ink-2)}
+.dek{max-width:62ch;color:var(--ink-2);font-size:1.08rem}
+
+/* tab bar */
+.tabbar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--rule);padding-top:env(safe-area-inset-top, 0px)}
+.tabbar .wrap{display:flex;align-items:center;gap:16px;padding-block:10px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--rule);border-radius:999px}
+.tabs button{border:0;background:none;padding:8px 20px;border-radius:999px;font-weight:700;cursor:pointer;font-size:.98rem;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.tab-note{color:var(--ink-3);font-size:.9rem;margin-left:auto;text-align:right}
+
+main{padding-block:28px 80px}
+
+/* shared bits */
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+.label{font-family:var(--f-sc);font-size:1.05rem;color:var(--ink-2);letter-spacing:.03em;margin-bottom:8px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{position:relative}
+.pill input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.pill span{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);font-weight:700;font-size:.95rem;color:var(--ink-2);cursor:pointer;transition:background .12s,color .12s,border-color .12s}
+.pill span small{font-weight:400;opacity:.75}
+.pill input:checked + span{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.pill input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.pill:hover span{border-color:var(--ink-3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:11px 22px;border-radius:999px;font-weight:700;cursor:pointer;font-size:1rem;text-decoration:none}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent);background:transparent}
+.btn.small{padding:7px 14px;font-size:.92rem}
+kbd{font-family:inherit;font-size:.78em;border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--ink-3)}
+
+/* setup */
+.setup{display:grid;gap:26px}
+.modes{display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:12px}
+.mode{position:relative}
+.mode input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.mode .card{height:100%;display:grid;gap:6px;align-content:start;padding:16px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);transition:border-color .12s, box-shadow .12s}
+.mode svg{width:56px;height:42px;color:var(--ink-2)}
+.mode b{font-family:var(--f-display);font-weight:400;font-size:1.55rem;line-height:1}
+.mode span{color:var(--ink-2);font-size:.93rem;line-height:1.4}
+.mode:hover .card{border-color:var(--ink-3)}
+.mode input:checked + .card{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.mode input:checked + .card svg{color:var(--accent)}
+.mode input:focus-visible + .card{outline:2px solid var(--accent);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:22px 28px}
+.go{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-top:6px;border-top:1px solid var(--rule);padding-top:22px}
+.go .btn{padding:13px 30px;font-size:1.08rem}
+.best{color:var(--ink-2);font-size:.95rem}
+
+/* game */
+.gtop{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.bar{flex:1;height:6px;border-radius:99px;background:var(--rule);overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.gstat{font-size:.92rem;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gstat b{color:var(--ink)}
+.stage{display:grid;grid-template-columns:minmax(0, 1.25fr) minmax(0, 1fr);gap:20px;align-items:start}
+.prompt{aspect-ratio:4/3;display:grid;place-items:center;padding:22px;position:relative;overflow:hidden}
+.prompt > svg.shape,.prompt > img.flag{position:absolute;inset:22px;width:calc(100% - 44px);height:calc(100% - 44px)}
+.shape path{fill:var(--ink);stroke:var(--ink);stroke-width:.6;stroke-linejoin:round}
+.prompt img.flag{object-fit:contain;filter:drop-shadow(0 0 .6px rgba(0,0,0,.45)) drop-shadow(0 6px 14px rgba(0,0,0,.10))}
+.prompt .bigtext{text-align:center;display:grid;gap:10px}
+.prompt .bigtext small{font-family:var(--f-sc);color:var(--ink-2);font-size:1.15rem}
+.prompt .bigtext b{font-family:var(--f-display);font-weight:400;font-size:clamp(2.2rem, 6vw, 3.8rem);line-height:1.05}
+.prompt .bigtext .mini{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:6px}
+.prompt .bigtext .mini img{height:42px;border-radius:2px;box-shadow:0 0 0 1px var(--rule)}
+.prompt .bigtext .mini svg{height:54px;width:72px}
+.prompt .tag{position:absolute;left:14px;top:12px;font-family:var(--f-sc);color:var(--ink-3);font-size:.95rem}
+.side{display:grid;gap:14px}
+.ask{font-family:var(--f-display);font-size:1.75rem;line-height:1.15}
+.choices{display:grid;gap:10px}
+.choice{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 16px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);cursor:pointer;font-weight:700;font-size:1.02rem;transition:border-color .12s, background .12s}
+.choice:hover:not(:disabled){border-color:var(--ink)}
+.choice kbd{flex:none}
+.choice:disabled{cursor:default}
+.choice.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.choice.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.choice.dim{opacity:.55}
+.typeform{display:flex;gap:8px}
+.typeform input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--rule);border-radius:8px;background:var(--surface);font-size:1.05rem}
+.typeform input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.typeform input.right{border-color:var(--good);background:var(--good-bg)}
+.typeform input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.skip{justify-self:start;background:none;border:0;color:var(--ink-3);cursor:pointer;padding:2px 0;font-size:.92rem;text-decoration:underline;text-underline-offset:3px}
+.feedback{display:grid;gap:14px}
+.verdict{font-weight:700;font-size:1.05rem;padding:10px 14px;border-radius:8px}
+.verdict.ok{background:var(--good-bg);color:var(--good)}
+.verdict.no{background:var(--bad-bg);color:var(--bad)}
+.verdict span{font-weight:400}
+.reveal{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;padding:14px}
+.reveal .globe{width:150px;height:150px}
+.reveal .globe svg{width:100%;height:100%;display:block}
+.facts{display:grid;gap:6px;min-width:0}
+.facts .fl{height:34px;width:auto;align-self:start;justify-self:start;border-radius:2px;box-shadow:0 0 0 1px var(--rule)}
+.facts h3{font-size:1.65rem}
+.facts p{color:var(--ink-2);font-size:.95rem}
+.facts p b{color:var(--ink)}
+.facts .note{font-size:.86rem;color:var(--ink-3)}
+.next-row{display:flex;align-items:center;gap:12px}
+.next-row .hint{color:var(--ink-3);font-size:.88rem}
+
+/* map mode */
+.stage.map-mode{grid-template-columns:1fr}
+.stage.map-mode .side{order:-1;grid-template-columns:minmax(0,1fr) auto;align-items:center;min-height:58px}
+.stage.map-mode .ask{font-size:1.6rem}
+.stage.map-mode .feedback{grid-column:1 / -1}
+.maprow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.maprow .fl{height:34px;border-radius:2px;box-shadow:0 0 0 1px var(--rule)}
+.maprow .verdict{flex:1 1 280px}
+.stage.map-mode .prompt{aspect-ratio:auto;padding:0;display:block}
+.mapbox{position:relative}
+.mapbox svg{display:block;width:100%;height:auto;max-height:68vh;touch-action:none;cursor:grab;border-radius:8px}
+.mapbox svg:active{cursor:grabbing}
+.mapbox .sea{fill:var(--sea)}
+.mapbox .grat{fill:none;stroke:var(--grat);stroke-width:.6;vector-effect:non-scaling-stroke}
+.mapbox .bg{fill:var(--land-2);stroke:var(--coast);stroke-width:.4;vector-effect:non-scaling-stroke}
+.mapbox .cty{fill:var(--land);stroke:var(--coast);stroke-width:.5;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .1s}
+.mapbox .dot{fill:var(--land);stroke:var(--coast);stroke-width:1;vector-effect:non-scaling-stroke;cursor:pointer}
+.mapbox .cty.zone,.mapbox .dot.zone{fill:var(--land)}
+.mapbox .cty.out,.mapbox .dot.out{fill:var(--land-2)}
+@media (hover:hover){.mapbox .cty:hover,.mapbox .dot:hover{fill:var(--hover)}}
+.mapbox .cty.right,.mapbox .dot.right{fill:var(--good)!important}
+.mapbox .cty.wrong,.mapbox .dot.wrong{fill:var(--bad)!important}
+.mapbox .cty.done,.mapbox .dot.done{fill:color-mix(in srgb, var(--good) 30%, var(--land))}
+.mapbox .ring{fill:none;stroke:var(--hi);stroke-width:2.5;vector-effect:non-scaling-stroke;pointer-events:none}
+.zoomctl{position:absolute;right:10px;top:10px;display:grid;gap:4px}
+.zoomctl button{width:36px;height:36px;border:1px solid var(--rule);background:var(--surface);border-radius:6px;cursor:pointer;font-weight:700;font-size:1.1rem;display:grid;place-items:center}
+.zoomctl button:hover{border-color:var(--ink)}
+.maphint{position:absolute;left:12px;bottom:10px;font-size:.82rem;color:var(--ink-3);background:color-mix(in srgb, var(--surface) 85%, transparent);padding:2px 8px;border-radius:4px;pointer-events:none}
+
+/* globe */
+.g-sea{fill:var(--sea);stroke:var(--coast);stroke-width:1}
+.g-grat{fill:none;stroke:var(--grat);stroke-width:.5}
+.g-land{fill:var(--land);stroke:var(--coast);stroke-width:.35}
+.g-hi{fill:var(--hi);stroke:var(--hi);stroke-width:.6}
+.g-ring{fill:none;stroke:var(--hi);stroke-width:2}
+.g-cap{fill:var(--paper);stroke:var(--ink);stroke-width:1.6}
+
+/* results */
+.results{display:grid;gap:24px}
+.res-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center;padding:24px}
+.ring-score{width:128px;height:128px;position:relative}
+.ring-score svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-score circle{fill:none;stroke-width:10}
+.ring-score .trk{stroke:var(--rule)}
+.ring-score .val{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .8s}
+.ring-score div{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:2.2rem}
+.res-head h2{font-size:clamp(2rem,5vw,2.8rem)}
+.res-head p{color:var(--ink-2);margin-top:6px}
+.res-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.missed h3{font-size:1.6rem;margin-bottom:12px}
+.mlist{display:grid;grid-template-columns:repeat(auto-fill, minmax(230px,1fr));gap:10px}
+.mitem{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:10px 12px}
+.mitem img{height:30px;border-radius:2px;box-shadow:0 0 0 1px var(--rule)}
+.mitem b{display:block;line-height:1.2}
+.mitem span{color:var(--ink-2);font-size:.9rem}
+
+/* study */
+.study-bar{display:grid;gap:14px;margin-bottom:20px}
+.study-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.search{flex:1;min-width:200px;max-width:360px;padding:10px 14px;border:1px solid var(--rule);border-radius:999px;background:var(--surface)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--ink-2);cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.count{color:var(--ink-3);font-size:.92rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(200px,1fr));gap:12px}
+.ccard{cursor:pointer;text-align:left;padding:0;overflow:hidden;display:grid;border:1px solid var(--rule);border-radius:8px;background:var(--surface);transition:border-color .12s}
+.ccard:hover{border-color:var(--ink-3)}
+.c-shape{aspect-ratio:4/3;padding:14px;border-bottom:1px solid var(--rule)}
+.c-shape svg{width:100%;height:100%;display:block}
+.c-body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px}
+.c-body img{width:40px;height:30px;border-radius:2px;box-shadow:0 0 0 1px var(--rule);object-fit:cover}
+.c-body b{display:block;line-height:1.2;font-size:.98rem}
+.c-body span{display:block;color:var(--ink-2);font-size:.86rem;line-height:1.3}
+.cover .ccard:not(.shown) .c-body b,.cover .ccard:not(.shown) .c-body span{filter:blur(6px);user-select:none}
+.empty{color:var(--ink-2);padding:30px 0}
+
+dialog{border:1px solid var(--rule);border-radius:10px;background:var(--surface);color:var(--ink);padding:0;width:min(720px, calc(100vw - 32px));max-height:calc(100vh - 32px)}
+dialog::backdrop{background:rgba(5,15,12,.55)}
+.dlg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
+.dlg .d-shape{aspect-ratio:1;padding:22px;border-right:1px solid var(--rule)}
+.dlg .d-shape svg{width:100%;height:100%}
+.dlg .d-info{padding:22px;display:grid;gap:12px;align-content:start}
+.dlg .d-info img.fl{height:56px;width:auto;justify-self:start;border-radius:3px;box-shadow:0 0 0 1px var(--rule)}
+.dlg h2{font-size:2.2rem}
+.dlg dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:.97rem}
+.dlg dt{color:var(--ink-3)}
+.dlg dd{margin:0}
+.dlg .globe{width:170px;height:170px}
+.dlg .close{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--rule);background:var(--surface);cursor:pointer;font-size:1.1rem}
+
+.loading{padding:40px 0;color:var(--ink-2)}
+
+@media (max-width: 860px){
+  .modes{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .stage{grid-template-columns:1fr}
+  .prompt{aspect-ratio:16/11}
+}
+@media (max-width: 600px){
+  .opts{grid-template-columns:1fr}
+  .tab-note{display:none}
+  .mode .card{padding:12px}
+  .mode b{font-size:1.3rem}
+  .mode span{font-size:.86rem}
+  .ask{font-size:1.45rem}
+  .reveal{grid-template-columns:1fr}
+  .reveal .globe{width:130px;height:130px;justify-self:center;order:2}
+  .stage.map-mode .side,.stage.map-mode .feedback{grid-template-columns:1fr}
+  .res-head{grid-template-columns:1fr;justify-items:start}
+  .dlg{grid-template-columns:1fr}
+  .dlg .d-shape{border-right:0;border-bottom:1px solid var(--rule);aspect-ratio:4/3}
+  .grid{grid-template-columns:repeat(2, minmax(0,1fr));gap:8px}
+  .c-body{grid-template-columns:1fr;gap:6px}
+  .gtop{flex-wrap:wrap}
+  .gtop .bar{order:5;flex-basis:100%}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+  <a class="home-link" href="../"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>All subjects</a>
+  <div class="eyebrow">Geography</div>
+  <h1>Countries <i>of the</i> World</h1>
+  <p class="dek">Name every country from its outline, its flag or its spot on the map, and match all 197 to their capitals. Pick a region to drill, or study the full atlas first.</p>
+</div></header>
+
+<nav class="tabbar"><div class="wrap">
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" aria-controls="play" id="tab-play" data-tab="play">Play</button>
+    <button role="tab" aria-selected="false" aria-controls="study" id="tab-study" data-tab="study">Study</button>
+  </div>
+  <div class="tab-note">193 UN members + Vatican City, Palestine, Kosovo &amp; Taiwan</div>
+</div></nav>
+
+<main class="wrap">
+  <p class="loading" id="loading">Loading maps…</p>
+
+  <section id="play" role="tabpanel" aria-labelledby="tab-play" hidden>
+    <form class="setup" id="setup">
+      <div>
+        <div class="label">Game</div>
+        <div class="modes">
+          <label class="mode"><input type="radio" name="mode" value="outline" checked><div class="card">
+            <svg viewBox="0 0 56 42" aria-hidden="true"><path d="M9 14l7-6 6 3 7-5 9 4 3 7 7 2-2 8-6 3-1 6-8-2-6 3-5-5-7 1-3-6 2-5z" fill="currentColor"/></svg>
+            <b>Outlines</b><span>Name the country from its shape alone.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="flag"><div class="card">
+            <svg viewBox="0 0 56 42" aria-hidden="true"><rect x="6" y="6" width="44" height="30" rx="2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M6 16h44M6 26h44" stroke="currentColor" stroke-width="2.5"/><rect x="6" y="6" width="15" height="30" fill="currentColor"/></svg>
+            <b>Flags</b><span>Name the country that flies it.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="capital"><div class="card">
+            <svg viewBox="0 0 56 42" aria-hidden="true"><path d="M28 5 10 15h36z" fill="currentColor"/><path d="M14 18v13M22 18v13M34 18v13M42 18v13" stroke="currentColor" stroke-width="3"/><path d="M9 35h38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            <b>Capitals</b><span>Match countries and their capital cities.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="map"><div class="card">
+            <svg viewBox="0 0 56 42" aria-hidden="true"><path d="M6 10l14-4 16 5 14-4v25l-14 4-16-5-14 4z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 6v26M36 11v25" stroke="currentColor" stroke-width="2"/><circle cx="28" cy="20" r="4" fill="currentColor"/></svg>
+            <b>Map</b><span>Find the country on a world map.</span></div></label>
+        </div>
+      </div>
+      <div class="opts">
+        <div><div class="label">Region</div><div class="pills" id="region-pills"></div></div>
+        <div><div class="label">Questions</div><div class="pills" id="len-pills"></div></div>
+        <div id="answer-opt"><div class="label">Answer by</div><div class="pills">
+          <label class="pill"><input type="radio" name="answer" value="choice" checked><span>Multiple choice</span></label>
+          <label class="pill"><input type="radio" name="answer" value="type"><span>Typing it</span></label>
+        </div></div>
+        <div id="dir-opt" hidden><div class="label">Direction</div><div class="pills">
+          <label class="pill"><input type="radio" name="dir" value="c2k" checked><span>Country → capital</span></label>
+          <label class="pill"><input type="radio" name="dir" value="k2c"><span>Capital → country</span></label>
+        </div></div>
+      </div>
+      <div class="go"><button class="btn" type="submit">Start game</button><span class="best" id="best"></span></div>
+    </form>
+
+    <div id="game" hidden>
+      <div class="gtop">
+        <button class="btn ghost small" type="button" id="quit">End game</button>
+        <div class="bar"><span id="bar"></span></div>
+        <div class="gstat" id="gstat"></div>
+      </div>
+      <div class="stage" id="stage">
+        <div class="prompt panel" id="prompt"></div>
+        <div class="side">
+          <p class="ask" id="ask"></p>
+          <div id="answers"></div>
+          <div class="feedback" id="feedback" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="results" id="results" hidden></div>
+  </section>
+
+  <section id="study" role="tabpanel" aria-labelledby="tab-study" hidden>
+    <div class="study-bar">
+      <div class="pills" id="study-regions"></div>
+      <div class="study-row">
+        <input class="search" id="search" type="search" placeholder="Search countries or capitals" aria-label="Search countries or capitals">
+        <label class="toggle"><input type="checkbox" id="cover"> Hide names (tap a card to reveal)</label>
+        <span class="count" id="study-count"></span>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<dialog id="dlg"><button class="close" type="button" aria-label="Close" id="dlg-close">✕</button><div id="dlg-body"></div></dialog>
+
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const REGIONS = ['World', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('geo:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('geo:' + k, JSON.stringify(v)); } catch (e) {} }
+};
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const flagSrc = c => 'flags/' + c.cc.toLowerCase() + '.svg';
+
+let C = [], byCC = {}, worldFeats = [], bgFeats = [];
+
+/* ---------- data ---------- */
+async function load() {
+  const [meta, topo, detail] = await Promise.all(['data/countries.json', 'data/world-50m.json', 'data/detail.json'].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })));
+  const geoms = topo.objects.countries.geometries;
+  const byName = n => geoms.find(g => g.properties.name === n);
+  const used = new Set();
+  C = meta.countries;
+  for (const c of C) {
+    let g = c.cc === 'XK' ? byName('Kosovo') : geoms.find(g => g.id === c.id && !/Ashmore/.test(g.properties.name));
+    let geometry;
+    if (c.cc === 'SO') { const s = byName('Somaliland'); used.add(s); geometry = topojson.merge(topo, [g, s]); }
+    else if (c.cc === 'CY') { const n = byName('N. Cyprus'); used.add(n); geometry = topojson.merge(topo, [g, n]); }
+    else if (g) geometry = topojson.feature(topo, g).geometry;
+    else if (meta.extra[c.id]) geometry = meta.extra[c.id].geometry;
+    if (g) used.add(g);
+    c.geo = { type: 'Feature', geometry };
+    c.main = mainParts(detail[c.cc] ? { type: 'Feature', geometry: detail[c.cc] } : c.geo);
+    c.mainLo = mainParts(c.geo);
+    c.ctr = d3.geoCentroid(c.mainLo);
+    c.accept = [c.name, ...c.alt];
+    c.capAccept = [c.cap, ...c.capAlt];
+    byCC[c.cc] = c;
+  }
+  bgFeats = geoms.filter(g => !used.has(g) && g.properties.name !== 'Antarctica').map(g => topojson.feature(topo, g));
+  worldFeats = geoms.filter(g => g.properties.name !== 'Antarctica').map(g => topojson.feature(topo, g));
+  worldFeats.push(meta.extra['798']);
+}
+
+// Keep the main landmass plus nearby islands; drop far-flung territories (French Guiana, Alaska, Canaries...).
+function mainParts(f) {
+  const g = f.geometry;
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+  const info = polys.map(p => {
+    let pg = { type: 'Polygon', coordinates: p }, a = d3.geoArea(pg);
+    if (a > 2 * Math.PI) { p = p.map(r => r.slice().reverse()); pg = { type: 'Polygon', coordinates: p }; a = d3.geoArea(pg); } // wound the wrong way
+    return { p, a, c: d3.geoCentroid(pg) };
+  });
+  const main = info.reduce((m, x) => x.a > m.a ? x : m, info[0]);
+  const thr = Math.max(8 * Math.PI / 180, 2.2 * Math.sqrt(main.a / Math.PI));
+  const keep = info.filter(x => d3.geoDistance(x.c, main.c) <= thr).map(x => x.p);
+  return { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates: keep } };
+}
+
+/* ---------- drawing ---------- */
+function outlinePath(c, w, h, pad) {
+  if (!c._ol || c._ol.key !== w + 'x' + h) {
+    const f = c.main;
+    const b = d3.geoBounds(f), ctr = d3.geoCentroid(f);
+    const y0 = b[0][1], y1 = b[1][1], dy = y1 - y0;
+    const proj = d3.geoConicEqualArea().rotate([-ctr[0], 0]).parallels([y0 + dy / 6, y1 - dy / 6]).fitExtent([[pad, pad], [w - pad, h - pad]], f);
+    const path = d3.geoPath(proj).digits(1);
+    // Scattered archipelagos (Kiribati, Tuvalu...) would be near-invisible specks: give them a heavy stroke.
+    const fill = path.area(f) / ((w - 2 * pad) * (h - 2 * pad));
+    c._ol = { key: w + 'x' + h, d: path(f), sw: fill < 0.03 ? (w / 140).toFixed(2) : null };
+  }
+  return c._ol.d;
+}
+function outlineStroke(c) { return c._ol && c._ol.sw ? ` style="stroke-width:${c._ol.sw}"` : ''; }
+function outlineSVG(c, w = 400, h = 300, pad = 6, label = 'Country outline') {
+  const d = outlinePath(c, w, h, pad);
+  return `<svg class="shape" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><path d="${d}"${outlineStroke(c)}/></svg>`;
+}
+function extentDeg(c) {
+  if (c._ext == null) {
+    let m = 0;
+    const walk = a => { if (typeof a[0] === 'number') { const d = d3.geoDistance(c.ctr, a); if (d > m) m = d; } else a.forEach(walk); };
+    walk(c.mainLo.geometry.coordinates);
+    c._ext = m * 180 / Math.PI;
+  }
+  return c._ext;
+}
+// A circular "lens" locator: whole globe for big countries, a zoomed-in disc for small ones.
+function globeSVG(c, size = 160) {
+  const R = Math.max(14, Math.min(90, extentDeg(c) * 3.2));
+  const proj = d3.geoOrthographic().rotate([-c.ctr[0], -c.ctr[1]]).clipAngle(R)
+    .fitExtent([[3, 3], [size - 3, size - 3]], d3.geoCircle().center(c.ctr).radius(R)());
+  const path = d3.geoPath(proj).digits(1);
+  let s = `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Location of ${esc(c.name)}"><circle class="g-sea" cx="${size / 2}" cy="${size / 2}" r="${size / 2 - 3}"/>`;
+  s += `<path class="g-grat" d="${path(d3.geoGraticule().step(R > 40 ? [20, 20] : [5, 5])())}"/>`;
+  s += `<path class="g-land" d="${worldFeats.map(f => path(f) || '').join('')}"/>`;
+  s += `<path class="g-hi" d="${path(c.geo) || ''}"/>`;
+  const p = proj(c.ctr);
+  if (extentDeg(c) < R / 4 && p) s += `<circle class="g-ring" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${Math.max(9, 1.25 * extentDeg(c) / R * (size / 2 - 3)).toFixed(1)}"/>`;
+  if (c.capLL) { const q = proj(c.capLL); if (q && d3.geoDistance(c.capLL, c.ctr) < R * Math.PI / 180) s += `<circle class="g-cap" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3"/>`; }
+  return s + '</svg>';
+}
+
+/* ---------- answer checking ---------- */
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  .replace(/&/g, ' and ').replace(/['’`.]/g, '').replace(/\bsaint\b/g, 'st').replace(/[^a-z0-9]+/g, ' ')
+  .replace(/^the /, '').replace(/\bthe\b/g, ' ').replace(/\s+/g, ' ').trim();
+function lev(a, b) {
+  if (a === b) return 0;
+  const m = a.length, n = b.length; if (!m || !n) return m || n;
+  let pp = new Array(n + 1).fill(0), prev = Array.from({ length: n + 1 }, (_, i) => i), cur = new Array(n + 1);
+  for (let i = 1; i <= m; i++) {
+    cur[0] = i;
+    for (let j = 1; j <= n; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) cur[j] = Math.min(cur[j], pp[j - 2] + 1);
+    }
+    [pp, prev, cur] = [prev, cur, pp];
+  }
+  return prev[n];
+}
+// Accept small typos, but only if the guess isn't closer to (or equal to) some other answer.
+function check(typed, target, field) {
+  const t = norm(typed); if (!t) return { ok: false };
+  const list = c => (field === 'cap' ? c.capAccept : c.accept).map(norm);
+  const mine = list(target);
+  if (mine.includes(t)) return { ok: true, exact: true };
+  let dT = Infinity, len = 0;
+  for (const a of mine) { const d = lev(t, a); if (d < dT) { dT = d; len = a.length; } }
+  let dO = Infinity;
+  for (const c of C) { if (c === target) continue; for (const a of list(c)) { if (a === t) return { ok: false }; const d = lev(t, a); if (d < dO) dO = d; } }
+  const tol = len >= 9 ? 2 : len >= 5 ? 1 : 0;
+  return { ok: dT <= tol && dT < dO, exact: false };
+}
+
+/* ---------- setup ---------- */
+const S = { mode: 'outline', region: 'World', len: '10', answer: 'choice', dir: 'c2k', ...store.get('settings', {}) };
+function poolFor(region) { return region === 'World' ? C : C.filter(c => c.region === region); }
+function buildSetup() {
+  $('#region-pills').innerHTML = REGIONS.map(r => `<label class="pill"><input type="radio" name="region" value="${r}"><span>${r} <small>${poolFor(r).length}</small></span></label>`).join('');
+  $('#study-regions').innerHTML = REGIONS.map(r => `<label class="pill"><input type="radio" name="sregion" value="${r}"${r === 'World' ? ' checked' : ''}><span>${r === 'World' ? 'All' : r}</span></label>`).join('');
+  const f = $('#setup');
+  for (const k of ['mode', 'region', 'answer', 'dir']) { const el = f.querySelector(`input[name="${k}"][value="${S[k]}"]`); if (el) el.checked = true; }
+  f.addEventListener('change', syncSetup);
+  f.addEventListener('submit', e => { e.preventDefault(); startGame(); });
+  syncSetup();
+}
+function syncSetup() {
+  const f = $('#setup');
+  for (const k of ['mode', 'region', 'answer', 'dir']) { const el = f.querySelector(`input[name="${k}"]:checked`); if (el) S[k] = el.value; }
+  const lenEl = f.querySelector('input[name="len"]:checked'); if (lenEl) S.len = lenEl.value;
+  const n = poolFor(S.region).length;
+  const lens = [['10', '10'], ['25', '25'], ['all', 'All ' + n]].filter(([v]) => v === 'all' || +v < n);
+  if (!lens.some(([v]) => v === S.len)) S.len = lens[0][0];
+  $('#len-pills').innerHTML = lens.map(([v, t]) => `<label class="pill"><input type="radio" name="len" value="${v}"${v === S.len ? ' checked' : ''}><span>${t}</span></label>`).join('');
+  $('#answer-opt').hidden = S.mode === 'map';
+  $('#dir-opt').hidden = S.mode !== 'capital';
+  store.set('settings', S);
+  const b = store.get('best', {})[bestKey()];
+  $('#best').textContent = b ? `Your best here: ${b.score} / ${b.total} (${Math.round(100 * b.score / b.total)}%)` : '';
+}
+const bestKey = () => [S.mode, S.mode === 'capital' ? S.dir : '', S.region, S.len, S.mode === 'map' ? '' : S.answer].join('|');
+
+/* ---------- game ---------- */
+let G = null;
+function startGame(list) {
+  const pool = poolFor(S.region);
+  let qs = list ? shuffle(list) : shuffle(pool);
+  if (!list && S.len !== 'all') qs = qs.slice(0, +S.len);
+  G = { qs, i: 0, score: 0, streak: 0, bestStreak: 0, missed: [], answered: false, retry: !!list, cfg: { ...S } };
+  $('#setup').hidden = true; $('#results').hidden = true; $('#game').hidden = false;
+  const stage = $('#stage');
+  stage.classList.toggle('map-mode', S.mode === 'map');
+  if (S.mode === 'map') buildMap(S.region); else { MAP = null; $('#prompt').innerHTML = ''; }
+  ask();
+  $('#game').scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+function hud() {
+  $('#bar').style.width = (100 * G.i / G.qs.length) + '%';
+  $('#gstat').innerHTML = `<b>${Math.min(G.i + 1, G.qs.length)}</b> / ${G.qs.length} &nbsp;·&nbsp; Score <b>${G.score}</b> &nbsp;·&nbsp; Streak <b>${G.streak}</b>`;
+}
+function distractors(c, n = 3) {
+  const others = C.filter(x => x !== c);
+  const sub = shuffle(others.filter(x => x.sub === c.sub)), reg = shuffle(others.filter(x => x.region === c.region && x.sub !== c.sub)), rest = shuffle(others.filter(x => x.region !== c.region));
+  const out = [];
+  for (const x of [...sub.slice(0, 2), ...reg, ...sub.slice(2), ...rest]) { if (out.length >= n) break; if (!out.includes(x)) out.push(x); }
+  return out;
+}
+function ask() {
+  const c = G.qs[G.i], m = G.cfg.mode;
+  G.answered = false; G.cur = c;
+  $('#ask').hidden = false; $('#answers').hidden = false;
+  hud();
+  $('#feedback').hidden = true; $('#feedback').innerHTML = '';
+  const P = $('#prompt');
+  let field = 'name', q = '';
+  if (m === 'outline') { P.innerHTML = outlineSVG(c, 400, 300, 8); q = 'Which country is this?'; }
+  else if (m === 'flag') { P.innerHTML = `<img class="flag" src="${flagSrc(c)}" alt="Flag to identify">`; q = 'Whose flag is this?'; }
+  else if (m === 'capital' && G.cfg.dir === 'c2k') {
+    P.innerHTML = `<div class="bigtext"><small>Capital of</small><b>${esc(c.name)}</b><div class="mini"><img src="${flagSrc(c)}" alt=""><svg class="shape" viewBox="0 0 120 90" aria-hidden="true"><path d="${outlinePath(c, 120, 90, 3)}"${outlineStroke(c)}/></svg></div></div>`;
+    q = `What is the capital of ${esc(c.name)}?`; field = 'cap';
+  } else if (m === 'capital') {
+    P.innerHTML = `<div class="bigtext"><small>Capital city</small><b>${esc(c.cap)}</b></div>`;
+    q = `${esc(c.cap)} is the capital of…`;
+  } else { mapAsk(c); q = `Find <b>${esc(c.name)}</b>`; }
+  G.field = field;
+  $('#ask').innerHTML = q;
+  const A = $('#answers');
+  if (m === 'map') { A.innerHTML = `<button class="skip" type="button" id="giveup">Show me</button>`; $('#giveup').onclick = () => answerMap(null); return; }
+  if (G.cfg.answer === 'choice') {
+    const opts = shuffle([c, ...distractors(c)]);
+    A.innerHTML = `<div class="choices">${opts.map((o, k) => `<button class="choice" type="button" data-cc="${o.cc}"><kbd>${k + 1}</kbd>${esc(field === 'cap' ? o.cap : o.name)}</button>`).join('')}</div>`;
+    $$('.choice', A).forEach(b => b.onclick = () => answerChoice(b));
+  } else {
+    A.innerHTML = `<form class="typeform" id="tf" autocomplete="off"><input id="ti" type="text" autocapitalize="words" spellcheck="false" placeholder="${field === 'cap' ? 'Type the capital' : 'Type the country'}" aria-label="Your answer"><button class="btn" type="submit">Check</button></form><button class="skip" type="button" id="giveup">I don't know</button>`;
+    $('#tf').onsubmit = e => { e.preventDefault(); const v = $('#ti').value; if (!v.trim()) return; answerTyped(v); };
+    $('#giveup').onclick = () => answerTyped('');
+    setTimeout(() => $('#ti') && $('#ti').focus({ preventScroll: true }), 30);
+  }
+}
+function answerChoice(btn) {
+  if (G.answered) return;
+  const c = G.cur, ok = btn.dataset.cc === c.cc;
+  $$('.choice').forEach(b => { b.disabled = true; if (b.dataset.cc === c.cc) b.classList.add('right'); else if (b === btn) b.classList.add('wrong'); else b.classList.add('dim'); });
+  const picked = byCC[btn.dataset.cc];
+  finish(ok, ok ? '' : `You picked ${esc(G.field === 'cap' ? picked.cap + ' (' + picked.name + ')' : picked.name)}.`);
+}
+function answerTyped(v) {
+  if (G.answered) return;
+  const c = G.cur, r = v ? check(v, c, G.field) : { ok: false };
+  const inp = $('#ti'); inp.disabled = true; inp.classList.add(r.ok ? 'right' : 'wrong');
+  $('#tf button').disabled = true; $('#giveup').hidden = true;
+  const correct = G.field === 'cap' ? c.cap : c.name;
+  finish(r.ok, r.ok ? (r.exact ? '' : `Spelled ${esc(correct)}.`) : (v ? `You typed “${esc(v)}”.` : ''));
+}
+function finish(ok, extra) {
+  G.answered = true;
+  const c = G.cur;
+  if (ok) { G.score++; G.streak++; G.bestStreak = Math.max(G.bestStreak, G.streak); } else { G.streak = 0; G.missed.push(c); }
+  hud();
+  const isMap = G.cfg.mode === 'map';
+  const answerText = G.field === 'cap' ? c.cap : c.name;
+  const verdict = ok ? `<div class="verdict ok">Correct! <span>${extra}</span></div>`
+    : `<div class="verdict no">Not quite. It’s ${esc(answerText)}. <span>${extra}</span></div>`;
+  const last = G.i === G.qs.length - 1;
+  const F = $('#feedback');
+  if (isMap) {
+    $('#ask').hidden = true; $('#answers').hidden = true;
+    F.innerHTML = `<div class="maprow"><img class="fl" src="${flagSrc(c)}" alt="Flag of ${esc(c.name)}">${ok
+      ? `<div class="verdict ok">Correct! ${esc(c.name)} <span>· capital ${esc(c.cap)}</span></div>`
+      : `<div class="verdict no">That’s ${esc(c.name)} <span>(ringed) · capital ${esc(c.cap)}. ${extra}</span></div>`}<button class="btn" type="button" id="next">${last ? 'See results' : 'Next'}</button></div>`;
+  } else F.innerHTML = `${verdict}
+    <div class="reveal panel">
+      <div class="globe">${isMap ? '' : globeSVG(c, 150)}</div>
+      <div class="facts">
+        <img class="fl" src="${flagSrc(c)}" alt="Flag of ${esc(c.name)}">
+        <h3>${esc(c.name)}</h3>
+        <p>Capital: <b>${esc(c.cap)}</b> · ${esc(c.sub || c.region)}</p>
+        ${c.note ? `<p class="note">${esc(c.note)}</p>` : ''}
+      </div>
+    </div>
+    <div class="next-row"><button class="btn" type="button" id="next">${last ? 'See results' : 'Next'}</button><span class="hint"><kbd>Enter</kbd></span></div>`;
+  F.hidden = false;
+  const nb = $('#next'); nb.onclick = next;
+  setTimeout(() => nb.focus({ preventScroll: true }), 20);
+  if (window.matchMedia('(max-width: 860px)').matches && !isMap) F.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function next() {
+  if (!G || !G.answered) return;
+  G.i++;
+  if (G.i >= G.qs.length) return results();
+  ask();
+}
+document.addEventListener('keydown', e => {
+  if (!G || $('#game').hidden || G.answered || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (G.cfg.mode !== 'map' && G.cfg.answer === 'choice' && /^[1-4]$/.test(e.key)) {
+    const b = $$('.choice')[+e.key - 1]; if (b) { e.preventDefault(); b.click(); }
+  }
+});
+$('#quit').onclick = () => { if (G && G.i > 0) results(true); else showSetup(); };
+function showSetup() { $('#game').hidden = true; $('#results').hidden = true; $('#setup').hidden = false; G = null; syncSetup(); }
+function results(early) {
+  const done = early ? G.i + (G.answered ? 1 : 0) : G.qs.length;
+  const total = done || 1, pct = Math.round(100 * G.score / total);
+  let newBest = false;
+  if (!early && !G.retry) {
+    const all = store.get('best', {}), k = bestKey(), cur = all[k];
+    if (!cur || G.score / G.qs.length > cur.score / cur.total) { all[k] = { score: G.score, total: G.qs.length }; store.set('best', all); newBest = true; }
+  }
+  const msg = pct === 100 ? 'Flawless.' : pct >= 85 ? 'Excellent work.' : pct >= 65 ? 'Solid. A few to review.' : pct >= 40 ? 'Getting there.' : 'Keep practising.';
+  const modeName = { outline: 'Outlines', flag: 'Flags', capital: 'Capitals', map: 'Map' }[G.cfg.mode];
+  const R = $('#results'), circ = 2 * Math.PI * 54;
+  R.innerHTML = `<div class="res-head panel">
+      <div class="ring-score"><svg viewBox="0 0 128 128"><circle class="trk" cx="64" cy="64" r="54"/><circle class="val" cx="64" cy="64" r="54" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/></svg><div>${pct}%</div></div>
+      <div><h2>${msg}</h2><p>${G.score} of ${done} correct · ${modeName} · ${esc(G.cfg.region)} · best streak ${G.bestStreak}${newBest && !early ? ' · <b>new best for this setup</b>' : ''}</p>
+      <div class="res-actions">${G.missed.length ? `<button class="btn" type="button" id="r-missed">Practise the ${G.missed.length} missed</button>` : ''}<button class="btn ${G.missed.length ? 'ghost' : ''}" type="button" id="r-again">Play again</button><button class="btn ghost" type="button" id="r-setup">Change game</button></div></div>
+    </div>
+    ${G.missed.length ? `<div class="missed"><h3>To review</h3><div class="mlist">${G.missed.map(c => `<div class="mitem panel"><img src="${flagSrc(c)}" alt=""><div><b>${esc(c.name)}</b><span>${esc(c.cap)}</span></div></div>`).join('')}</div></div>` : ''}`;
+  $('#game').hidden = true; R.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => { const v = $('.val', R); if (v) v.style.strokeDashoffset = circ * (1 - pct / 100); }));
+  const missed = G.missed.slice(), cfg = G.cfg;
+  if ($('#r-missed')) $('#r-missed').onclick = () => { Object.assign(S, cfg); startGame(missed); };
+  $('#r-again').onclick = () => { Object.assign(S, cfg); startGame(); };
+  $('#r-setup').onclick = showSetup;
+  R.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+/* ---------- map mode ---------- */
+let MAP = null;
+const ROT = { World: -10, Africa: -20, Asia: -90, Europe: -15, 'North America': 95, 'South America': 60, Oceania: -165 };
+function buildMap(region) {
+  const W = 960;
+  const proj = d3.geoNaturalEarth1().rotate([ROT[region], 0]).fitWidth(W, { type: 'Sphere' });
+  const path = d3.geoPath(proj).digits(2);
+  const yTop = Math.max(0, proj([-ROT[region], 84])[1]), yBot = proj([-ROT[region], -58])[1], H = yBot - yTop;
+  const inZone = c => region === 'World' || c.region === region;
+  const small = C.filter(c => c.area < 6000 || c.cc === 'TV');
+  const P = $('#prompt');
+  P.innerHTML = `<div class="mapbox"><svg viewBox="0 ${yTop} ${W} ${H}" aria-label="World map"><g class="zoomg">
+    <path class="sea" d="${path({ type: 'Sphere' })}"/>
+    <path class="grat" d="${path(d3.geoGraticule10())}"/>
+    ${bgFeats.map(f => `<path class="bg" d="${path(f) || ''}"/>`).join('')}
+    ${C.map(c => `<path class="cty ${inZone(c) ? 'zone' : 'out'}" data-cc="${c.cc}" d="${path(c.geo) || ''}"/>`).join('')}
+    <g class="dots">${small.map(c => { const p = proj(c.ctr); return p ? `<circle class="dot ${inZone(c) ? 'zone' : 'out'}" data-cc="${c.cc}" cx="${p[0].toFixed(2)}" cy="${p[1].toFixed(2)}" r="4"/>` : ''; }).join('')}</g>
+    <g class="rings"></g>
+  </g></svg>
+  <div class="zoomctl"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Reset view">⟲</button></div>
+  <div class="maphint">Drag to pan · scroll or pinch to zoom · small countries are dots</div></div>`;
+  const svg = d3.select(P).select('svg'), g = svg.select('.zoomg');
+  let k = 1;
+  const zoom = d3.zoom().scaleExtent([1, 60]).translateExtent([[0, yTop], [W, yBot]]).extent([[0, yTop], [W, yBot]]).clickDistance(5)
+    .on('zoom', e => { k = e.transform.k; g.attr('transform', e.transform); g.selectAll('.dot').attr('r', 4 / Math.sqrt(k) + 0.6 / k); g.selectAll('.ring').attr('r', 16 / k); });
+  svg.call(zoom).on('dblclick.zoom', null);
+  const fitBounds = (b, maxK = 12, dur = 600) => {
+    const [[x0, y0], [x1, y1]] = b, pad = 30;
+    const s = Math.max(1, Math.min(maxK, 0.92 / Math.max((x1 - x0 + pad) / W, (y1 - y0 + pad) / H)));
+    const t = d3.zoomIdentity.translate(W / 2, yTop + H / 2).scale(s).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+    svg.transition().duration(dur).call(zoom.transform, t);
+  };
+  const union = list => { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const f of list) { const [[a, b], [c, d]] = path.bounds(f); if (!isFinite(a)) continue; x0 = Math.min(x0, a); y0 = Math.min(y0, b); x1 = Math.max(x1, c); y1 = Math.max(y1, d); } return [[x0, y0], [x1, y1]]; };
+  const home = region === 'World' ? [[0, yTop], [W, yBot]] : union(poolFor(region).map(c => c.mainLo));
+  const goHome = (dur = 600) => fitBounds(home, 12, dur);
+  $$('.zoomctl button', P).forEach(b => b.onclick = () => {
+    if (b.dataset.z === 'reset') goHome(); else svg.transition().duration(300).call(zoom.scaleBy, b.dataset.z === 'in' ? 1.8 : 1 / 1.8);
+  });
+  svg.on('click', e => { const t = e.target.closest('[data-cc]'); if (t && G && !G.answered) answerMap(byCC[t.dataset.cc]); });
+  MAP = { svg, g, path, proj, fitBounds, union, goHome, done: new Set(), moved: false };
+  goHome(0);
+}
+function mapAsk() {
+  if (!MAP) return;
+  MAP.g.selectAll('.right,.wrong').classed('right', false).classed('wrong', false);
+  MAP.g.select('.rings').html('');
+  if (MAP.moved) { MAP.goHome(500); MAP.moved = false; }
+}
+function answerMap(clicked) {
+  if (G.answered) return;
+  const c = G.cur, ok = clicked === c;
+  const sel = cc => MAP.g.selectAll(`[data-cc="${cc}"]`);
+  sel(c.cc).classed('right', true);
+  if (clicked && !ok) sel(clicked.cc).classed('wrong', true);
+  if (ok) { MAP.done.add(c.cc); sel(c.cc).classed('done', true); }
+  else {
+    const p = MAP.proj(c.ctr);
+    if (p) MAP.g.select('.rings').html(`<circle class="ring" cx="${p[0]}" cy="${p[1]}" r="16"/>`);
+    const b = MAP.union(clicked ? [c.mainLo, clicked.mainLo] : [c.mainLo]);
+    const span = Math.max(b[1][0] - b[0][0], b[1][1] - b[0][1]);
+    MAP.fitBounds(span < 40 ? [[b[0][0] - 40, b[0][1] - 40], [b[1][0] + 40, b[1][1] + 40]] : b, 10, 700);
+    MAP.moved = true;
+  }
+  finish(ok, ok ? '' : clicked ? `You clicked ${esc(clicked.name)}.` : '');
+}
+
+/* ---------- study ---------- */
+let io;
+function buildStudy() {
+  const grid = $('#grid');
+  io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, c = byCC[el.dataset.cc];
+    el.innerHTML = outlineSVG(c, 240, 180, 4, 'Outline of ' + c.name); io.unobserve(el);
+  }), { rootMargin: '300px' });
+  grid.innerHTML = C.map(c => `<button class="ccard" type="button" data-cc="${c.cc}"><div class="c-shape" data-cc="${c.cc}"></div><div class="c-body"><img src="${flagSrc(c)}" alt="" loading="lazy"><div><b>${esc(c.name)}</b><span>${esc(c.cap)}</span></div></div></button>`).join('');
+  $$('.c-shape', grid).forEach(el => io.observe(el));
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.ccard'); if (!card) return;
+    if (grid.classList.contains('cover') && !card.classList.contains('shown')) { card.classList.add('shown'); return; }
+    openDetail(byCC[card.dataset.cc]);
+  });
+  const filter = () => {
+    const r = $('input[name="sregion"]:checked').value, q = norm($('#search').value);
+    let n = 0;
+    for (const card of $$('.ccard', grid)) {
+      const c = byCC[card.dataset.cc];
+      const show = (r === 'World' || c.region === r) && (!q || [...c.accept, ...c.capAccept].some(a => norm(a).includes(q)));
+      card.hidden = !show; if (show) n++;
+    }
+    $('#study-count').textContent = n + (n === 1 ? ' country' : ' countries');
+  };
+  $('#study-regions').addEventListener('change', filter);
+  $('#search').addEventListener('input', filter);
+  $('#cover').addEventListener('change', e => { grid.classList.toggle('cover', e.target.checked); $$('.ccard.shown', grid).forEach(c => c.classList.remove('shown')); });
+  filter();
+}
+function openDetail(c) {
+  $('#dlg-body').innerHTML = `<div class="dlg"><div class="d-shape">${outlineSVG(c, 300, 300, 6, 'Outline of ' + c.name)}</div>
+    <div class="d-info"><img class="fl" src="${flagSrc(c)}" alt="Flag of ${esc(c.name)}"><h2>${esc(c.name)}</h2>
+    <dl><dt>Capital</dt><dd><b>${esc(c.cap)}</b></dd><dt>Region</dt><dd>${esc(c.sub || c.region)}</dd><dt>Area</dt><dd>${c.area >= 10 ? Math.round(c.area).toLocaleString() : c.area} km²</dd>
+    ${c.note ? `<dt>Note</dt><dd>${esc(c.note)}</dd>` : ''}</dl>
+    <div class="globe">${globeSVG(c, 170)}</div></div></div>`;
+  $('#dlg').showModal();
+}
+$('#dlg-close').onclick = () => $('#dlg').close();
+$('#dlg').addEventListener('click', e => { if (e.target === $('#dlg')) $('#dlg').close(); });
+
+/* ---------- tabs ---------- */
+function showTab(t) {
+  $$('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('#play').hidden = t !== 'play'; $('#study').hidden = t !== 'study';
+  store.set('tab', t);
+}
+$$('.tabs button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+load().then(() => {
+  $('#loading').remove();
+  buildSetup(); buildStudy();
+  showTab(store.get('tab', 'play'));
+}).catch(err => { $('#loading').textContent = 'Could not load the map data. Please refresh the page.'; console.error(err); });
+})();
+</script>
+</body>
+</html>
